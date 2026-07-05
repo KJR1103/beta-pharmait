@@ -1,66 +1,86 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  ShoppingCart, 
-  User, 
-  Menu, 
+import { useCart } from "@/context/CartContext";
+import {
+  Search,
+  ShoppingCart,
+  User,
+  Menu,
   X,
   Pill,
   Heart,
-  Phone
+  Phone,
+  MapPin,
 } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cartCount] = useState(3);
+  const [search, setSearch] = useState("");
+  const { itemCount } = useCart();
+  const navigate = useNavigate();
+
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate(`/products?q=${encodeURIComponent(search)}`);
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-card/95 backdrop-blur-lg border-b border-border">
       {/* Top bar */}
-      <div className="bg-primary text-primary-foreground py-2 text-center text-sm">
-        <div className="container flex items-center justify-center gap-2">
-          <Phone className="w-4 h-4" />
-          <span>Besoin d'aide ? Appelez-nous au <strong>01 23 45 67 89</strong></span>
+      <div className="bg-primary text-primary-foreground py-2 text-xs sm:text-sm">
+        <div className="container flex flex-wrap items-center justify-center gap-x-6 gap-y-1">
+          <div className="flex items-center gap-2">
+            <Phone className="w-4 h-4" />
+            <span>+224 622 00 00 00</span>
+          </div>
+          <div className="hidden sm:flex items-center gap-2">
+            <MapPin className="w-4 h-4" />
+            <span>Livraison à Conakry et intérieur</span>
+          </div>
         </div>
       </div>
-      
-      {/* Main navbar */}
-      <nav className="container py-4">
+
+      <nav className="container py-3 md:py-4">
         <div className="flex items-center justify-between gap-4">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
+          <Link to="/" className="flex items-center gap-2 shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-soft">
               <Pill className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-foreground font-display">PharmaConnect</span>
+            <div className="flex flex-col leading-tight">
+              <span className="text-lg md:text-xl font-bold text-foreground font-display">
+                PharmaConnect
+              </span>
+              <span className="hidden md:block text-[10px] text-muted-foreground uppercase tracking-wider">
+                Guinée
+              </span>
+            </div>
           </Link>
 
-          {/* Search bar - desktop */}
-          <div className="hidden md:flex flex-1 max-w-xl mx-8">
+          <form onSubmit={submitSearch} className="hidden md:flex flex-1 max-w-xl mx-6">
             <div className="relative w-full">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input 
-                placeholder="Rechercher un médicament, une pharmacie..."
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Rechercher un médicament, une catégorie..."
                 className="pl-12 h-12 rounded-xl border-2 border-border focus:border-primary bg-secondary/50"
               />
             </div>
-          </div>
+          </form>
 
-          {/* Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 md:gap-2">
             <Button variant="ghost" size="icon" className="hidden md:flex">
               <Heart className="w-5 h-5" />
             </Button>
-            
+
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">
                 <ShoppingCart className="w-5 h-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center">
-                    {cartCount}
+                {itemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent text-accent-foreground text-xs font-bold flex items-center justify-center animate-scale-in">
+                    {itemCount}
                   </span>
                 )}
               </Button>
@@ -73,9 +93,9 @@ const Navbar = () => {
               </Button>
             </Link>
 
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               className="md:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
@@ -84,33 +104,37 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Search bar - mobile */}
-        <div className="md:hidden mt-4">
+        <form onSubmit={submitSearch} className="md:hidden mt-3">
           <div className="relative w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input 
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher..."
               className="pl-12 h-11 rounded-xl border-2 border-border focus:border-primary bg-secondary/50"
             />
           </div>
-        </div>
+        </form>
 
-        {/* Navigation links */}
-        <div className={`${isMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8 mt-4 md:mt-3 pt-4 md:pt-3 border-t md:border-t border-border`}>
-          <Link to="/products" className="text-foreground hover:text-primary transition-colors font-medium">
+        <div
+          className={`${
+            isMenuOpen ? "flex" : "hidden"
+          } md:flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8 mt-4 md:mt-3 pt-4 md:pt-3 border-t border-border`}
+        >
+          <Link to="/products" className="text-foreground hover:text-primary transition-colors font-medium story-link">
             Médicaments
           </Link>
-          <Link to="/categories" className="text-foreground hover:text-primary transition-colors font-medium">
+          <Link to="/products" className="text-foreground hover:text-primary transition-colors font-medium story-link">
             Catégories
           </Link>
-          <Link to="/prescriptions" className="text-foreground hover:text-primary transition-colors font-medium">
+          <Link to="/prescriptions" className="text-foreground hover:text-primary transition-colors font-medium story-link">
             Ordonnances
           </Link>
-          <Link to="/advice" className="text-foreground hover:text-primary transition-colors font-medium">
+          <Link to="/advice" className="text-foreground hover:text-primary transition-colors font-medium story-link">
             Conseils Santé
           </Link>
-          <Link to="/pharmacies" className="text-foreground hover:text-primary transition-colors font-medium">
-            Nos Pharmacies
+          <Link to="/tracking" className="text-foreground hover:text-primary transition-colors font-medium story-link">
+            Suivi commande
           </Link>
         </div>
       </nav>
