@@ -14,16 +14,362 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      invoices: {
+        Row: {
+          id: string
+          invoice_number: string
+          issued_at: string
+          order_id: string
+          total: number
+        }
+        Insert: {
+          id?: string
+          invoice_number?: string
+          issued_at?: string
+          order_id: string
+          total: number
+        }
+        Update: {
+          id?: string
+          invoice_number?: string
+          issued_at?: string
+          order_id?: string
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          subtotal: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          product_id: string
+          product_name: string
+          quantity: number
+          subtotal: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          subtotal?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          city: string
+          courier_id: string | null
+          created_at: string
+          customer_id: string
+          delivery_address: string
+          delivery_fee: number
+          id: string
+          notes: string | null
+          order_number: string
+          paid: boolean
+          payment_method: string
+          pharmacy_id: string
+          phone: string
+          prescription_url: string | null
+          status: Database["public"]["Enums"]["order_status"]
+          subtotal: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          city: string
+          courier_id?: string | null
+          created_at?: string
+          customer_id: string
+          delivery_address: string
+          delivery_fee?: number
+          id?: string
+          notes?: string | null
+          order_number?: string
+          paid?: boolean
+          payment_method: string
+          pharmacy_id: string
+          phone: string
+          prescription_url?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          city?: string
+          courier_id?: string | null
+          created_at?: string
+          customer_id?: string
+          delivery_address?: string
+          delivery_fee?: number
+          id?: string
+          notes?: string | null
+          order_number?: string
+          paid?: boolean
+          payment_method?: string
+          pharmacy_id?: string
+          phone?: string
+          prescription_url?: string | null
+          status?: Database["public"]["Enums"]["order_status"]
+          subtotal?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_pharmacy_id_fkey"
+            columns: ["pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "pharmacies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pharmacies: {
+        Row: {
+          active: boolean
+          address: string
+          agrement_doc_url: string | null
+          agrement_number: string
+          city: string
+          created_at: string
+          description: string | null
+          email: string | null
+          id: string
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          name: string
+          opening_hours: string | null
+          owner_id: string
+          phone: string
+          updated_at: string
+          verified: boolean
+        }
+        Insert: {
+          active?: boolean
+          address: string
+          agrement_doc_url?: string | null
+          agrement_number: string
+          city: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name: string
+          opening_hours?: string | null
+          owner_id: string
+          phone: string
+          updated_at?: string
+          verified?: boolean
+        }
+        Update: {
+          active?: boolean
+          address?: string
+          agrement_doc_url?: string | null
+          agrement_number?: string
+          city?: string
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string
+          opening_hours?: string | null
+          owner_id?: string
+          phone?: string
+          updated_at?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          active: boolean
+          category: string | null
+          composition: string | null
+          contraindications: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          indications: string | null
+          name: string
+          pharmacy_id: string
+          posology: string | null
+          price: number
+          requires_prescription: boolean
+          stock: number
+          storage: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category?: string | null
+          composition?: string | null
+          contraindications?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          indications?: string | null
+          name: string
+          pharmacy_id: string
+          posology?: string | null
+          price: number
+          requires_prescription?: boolean
+          stock?: number
+          storage?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string | null
+          composition?: string | null
+          contraindications?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          indications?: string | null
+          name?: string
+          pharmacy_id?: string
+          posology?: string | null
+          price?: number
+          requires_prescription?: boolean
+          stock?: number
+          storage?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_pharmacy_id_fkey"
+            columns: ["pharmacy_id"]
+            isOneToOne: false
+            referencedRelation: "pharmacies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          city: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          city?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "customer" | "pharmacy" | "courier" | "admin"
+      order_status:
+        | "pending"
+        | "confirmed"
+        | "preparing"
+        | "ready"
+        | "in_delivery"
+        | "delivered"
+        | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +496,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["customer", "pharmacy", "courier", "admin"],
+      order_status: [
+        "pending",
+        "confirmed",
+        "preparing",
+        "ready",
+        "in_delivery",
+        "delivered",
+        "cancelled",
+      ],
+    },
   },
 } as const
