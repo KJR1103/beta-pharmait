@@ -15,8 +15,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { formatGNF } from "@/data/products";
-import { BadgeCheck, ShieldAlert, Package, Plus, Store, Upload, Trash2, Edit, ClipboardList } from "lucide-react";
+import { formatGNF } from "@/lib/catalog";
+import { Link } from "react-router-dom";
+import { BadgeCheck, ShieldAlert, Package, Plus, Store, Upload, Trash2, Edit, ClipboardList, Receipt, TrendingUp } from "lucide-react";
 
 type Pharmacy = {
   id: string;
@@ -74,6 +75,7 @@ const DashboardPharmacy = () => {
   const [pharmacy, setPharmacy] = useState<Pharmacy | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [profileName, setProfileName] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   // form
@@ -88,9 +90,12 @@ const DashboardPharmacy = () => {
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const { data: pharm } = await supabase
-      .from("pharmacies").select("*").eq("owner_id", user.id).maybeSingle();
+    const [{ data: pharm }, { data: prof }] = await Promise.all([
+      supabase.from("pharmacies").select("*").eq("owner_id", user.id).maybeSingle(),
+      supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+    ]);
     setPharmacy(pharm as any);
+    setProfileName(prof?.full_name || "");
     if (pharm) {
       const [{ data: prods }, { data: ords }] = await Promise.all([
         supabase.from("products").select("*").eq("pharmacy_id", pharm.id).order("created_at", { ascending: false }),
@@ -186,7 +191,7 @@ const DashboardPharmacy = () => {
       <main className="flex-1 container py-6 md:py-10 space-y-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold font-display">Espace Pharmacie</h1>
+            <h1 className="text-2xl md:text-3xl font-bold font-display">Bonjour {profileName || pharmacy?.name || "cher pharmacien"} 👋</h1>
             <p className="text-muted-foreground text-sm">Gérez votre officine, catalogue et commandes.</p>
           </div>
           {pharmacy && (
@@ -195,6 +200,15 @@ const DashboardPharmacy = () => {
             </Badge>
           )}
         </div>
+
+        {pharmacy && (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Card variant="feature"><CardContent className="p-4"><div className="flex items-center gap-3"><Package className="w-7 h-7 text-primary" /><div><div className="text-xl font-bold">{products.length}</div><div className="text-xs text-muted-foreground">Produits</div></div></div></CardContent></Card>
+            <Card variant="feature"><CardContent className="p-4"><div className="flex items-center gap-3"><ClipboardList className="w-7 h-7 text-primary" /><div><div className="text-xl font-bold">{orders.length}</div><div className="text-xs text-muted-foreground">Commandes</div></div></div></CardContent></Card>
+            <Card variant="feature"><CardContent className="p-4"><div className="flex items-center gap-3"><Receipt className="w-7 h-7 text-primary" /><div><div className="text-xl font-bold">{orders.filter(o => o.paid).length}</div><div className="text-xs text-muted-foreground">Payées</div></div></div></CardContent></Card>
+            <Card variant="feature"><CardContent className="p-4"><div className="flex items-center gap-3"><TrendingUp className="w-7 h-7 text-primary" /><div><div className="text-lg font-bold">{formatGNF(orders.filter(o => o.paid).reduce((s, o) => s + Number(o.total), 0))}</div><div className="text-xs text-muted-foreground">CA encaissé</div></div></div></CardContent></Card>
+          </div>
+        )}
 
         <Tabs defaultValue={pharmacy ? "products" : "pharmacy"} className="space-y-4">
           <TabsList className="flex-wrap h-auto">

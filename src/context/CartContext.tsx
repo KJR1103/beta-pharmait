@@ -1,14 +1,14 @@
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
-import { Product } from "@/data/products";
+import type { CartProduct } from "@/lib/catalog";
 
 export type CartItem = {
-  product: Product;
+  product: CartProduct;
   quantity: number;
 };
 
 type CartContextValue = {
   items: CartItem[];
-  addItem: (product: Product, quantity?: number) => void;
+  addItem: (product: CartProduct, quantity?: number) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -17,8 +17,7 @@ type CartContextValue = {
 };
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
-
-const STORAGE_KEY = "pharmaconnect-cart-v1";
+const STORAGE_KEY = "pharmaconnect-cart-v2";
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>(() => {
@@ -35,17 +34,17 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  const addItem = (product: Product, quantity: number = 1) => {
+  const addItem = (product: CartProduct, quantity = 1) => {
     setItems((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
       if (existing) {
         return prev.map((i) =>
           i.product.id === product.id
-            ? { ...i, quantity: Math.min(i.quantity + quantity, product.stock) }
+            ? { ...i, quantity: Math.min(i.quantity + quantity, product.stock || 999) }
             : i
         );
       }
-      return [...prev, { product, quantity: Math.min(quantity, product.stock) }];
+      return [...prev, { product, quantity: Math.min(quantity, product.stock || 999) }];
     });
   };
 
@@ -57,7 +56,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       prev
         .map((i) =>
           i.product.id === productId
-            ? { ...i, quantity: Math.max(0, Math.min(quantity, i.product.stock)) }
+            ? { ...i, quantity: Math.max(0, Math.min(quantity, i.product.stock || 999)) }
             : i
         )
         .filter((i) => i.quantity > 0)

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
@@ -9,25 +10,28 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { formatGNF } from "@/data/products";
-import { Bike, CheckCircle } from "lucide-react";
+import { formatGNF } from "@/lib/catalog";
+import { Bike, CheckCircle, Receipt } from "lucide-react";
 
 const DashboardCourier = () => {
   const { user } = useAuth();
   const [available, setAvailable] = useState<any[]>([]);
   const [mine, setMine] = useState<any[]>([]);
+  const [profileName, setProfileName] = useState<string>("");
 
   const load = async () => {
     if (!user) return;
-    const { data: av } = await supabase.from("orders")
-      .select("*, pharmacies(name, city, address)")
-      .is("courier_id", null).in("status", ["ready", "preparing"])
-      .order("created_at", { ascending: false });
-    const { data: mn } = await supabase.from("orders")
-      .select("*, pharmacies(name, city, address)")
-      .eq("courier_id", user.id).order("created_at", { ascending: false });
+    const [{ data: av }, { data: mn }, { data: prof }] = await Promise.all([
+      supabase.from("orders").select("*, pharmacies(name, city, address)")
+        .is("courier_id", null).in("status", ["ready", "preparing"])
+        .order("created_at", { ascending: false }),
+      supabase.from("orders").select("*, pharmacies(name, city, address)")
+        .eq("courier_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+    ]);
     setAvailable(av ?? []);
     setMine(mn ?? []);
+    setProfileName(prof?.full_name || "");
   };
   useEffect(() => { load(); }, [user]);
 
@@ -51,9 +55,15 @@ const DashboardCourier = () => {
         <div className="flex items-center gap-3">
           <Bike className="w-8 h-8 text-primary" />
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold font-display">Espace Livreur</h1>
+            <h1 className="text-2xl md:text-3xl font-bold font-display">Bonjour {profileName || "livreur"} 🛵</h1>
             <p className="text-muted-foreground text-sm">Acceptez et suivez vos courses.</p>
           </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <Card variant="feature"><CardContent className="p-4"><div className="text-xl font-bold">{available.length}</div><div className="text-xs text-muted-foreground">Disponibles</div></CardContent></Card>
+          <Card variant="feature"><CardContent className="p-4"><div className="text-xl font-bold">{mine.filter(o => o.status !== "delivered").length}</div><div className="text-xs text-muted-foreground">En cours</div></CardContent></Card>
+          <Card variant="feature"><CardContent className="p-4"><div className="text-xl font-bold">{mine.filter(o => o.status === "delivered").length}</div><div className="text-xs text-muted-foreground">Livrées</div></CardContent></Card>
         </div>
 
         <Tabs defaultValue="available">
@@ -102,7 +112,8 @@ const DashboardCourier = () => {
                       <TableCell className="max-w-[220px] truncate">{o.delivery_address}, {o.city}</TableCell>
                       <TableCell><Badge>{o.status}</Badge></TableCell>
                       <TableCell>{formatGNF(Number(o.total))}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right space-x-1">
+                        {o.paid && <Button size="sm" variant="ghost" asChild><Link to={`/invoice/${o.id}`}><Receipt className="w-4 h-4" /></Link></Button>}
                         {o.status !== "delivered" && <Button size="sm" variant="success" onClick={() => deliver(o.id)}><CheckCircle className="w-4 h-4" /> Livrée</Button>}
                       </TableCell>
                     </TableRow>
