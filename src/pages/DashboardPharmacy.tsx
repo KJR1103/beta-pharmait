@@ -15,8 +15,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { formatGNF } from "@/data/products";
-import { BadgeCheck, ShieldAlert, Package, Plus, Store, Upload, Trash2, Edit, ClipboardList } from "lucide-react";
+import { formatGNF } from "@/lib/catalog";
+import { Link } from "react-router-dom";
+import { BadgeCheck, ShieldAlert, Package, Plus, Store, Upload, Trash2, Edit, ClipboardList, Receipt, TrendingUp } from "lucide-react";
 
 type Pharmacy = {
   id: string;
