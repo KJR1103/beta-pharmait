@@ -75,6 +75,7 @@ const DashboardPharmacy = () => {
   const [pharmacy, setPharmacy] = useState<Pharmacy | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [profileName, setProfileName] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   // form
