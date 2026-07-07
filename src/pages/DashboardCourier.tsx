@@ -112,7 +112,8 @@ const DashboardCourier = () => {
                       <TableCell className="max-w-[220px] truncate">{o.delivery_address}, {o.city}</TableCell>
                       <TableCell><Badge>{o.status}</Badge></TableCell>
                       <TableCell>{formatGNF(Number(o.total))}</TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right space-x-1">
+                        {o.paid && <Button size="sm" variant="ghost" asChild><Link to={`/invoice/${o.id}`}><Receipt className="w-4 h-4" /></Link></Button>}
                         {o.status !== "delivered" && <Button size="sm" variant="success" onClick={() => deliver(o.id)}><CheckCircle className="w-4 h-4" /> Livrée</Button>}
                       </TableCell>
                     </TableRow>
