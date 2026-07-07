@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 import { Minus, Plus, Trash2, ShoppingBag, Truck, Shield, ArrowRight, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
-import { formatGNF } from "@/data/products";
+import { formatGNF } from "@/lib/catalog";
 
 const Cart = () => {
   const { items, updateQuantity, removeItem, subtotal, itemCount } = useCart();
