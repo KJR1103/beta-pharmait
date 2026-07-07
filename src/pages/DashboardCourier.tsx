@@ -55,9 +55,15 @@ const DashboardCourier = () => {
         <div className="flex items-center gap-3">
           <Bike className="w-8 h-8 text-primary" />
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold font-display">Espace Livreur</h1>
+            <h1 className="text-2xl md:text-3xl font-bold font-display">Bonjour {profileName || "livreur"} 🛵</h1>
             <p className="text-muted-foreground text-sm">Acceptez et suivez vos courses.</p>
           </div>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          <Card variant="feature"><CardContent className="p-4"><div className="text-xl font-bold">{available.length}</div><div className="text-xs text-muted-foreground">Disponibles</div></CardContent></Card>
+          <Card variant="feature"><CardContent className="p-4"><div className="text-xl font-bold">{mine.filter(o => o.status !== "delivered").length}</div><div className="text-xs text-muted-foreground">En cours</div></CardContent></Card>
+          <Card variant="feature"><CardContent className="p-4"><div className="text-xl font-bold">{mine.filter(o => o.status === "delivered").length}</div><div className="text-xs text-muted-foreground">Livrées</div></CardContent></Card>
         </div>
 
         <Tabs defaultValue="available">
