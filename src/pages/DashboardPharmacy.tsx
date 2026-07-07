@@ -90,9 +90,12 @@ const DashboardPharmacy = () => {
   const load = async () => {
     if (!user) return;
     setLoading(true);
-    const { data: pharm } = await supabase
-      .from("pharmacies").select("*").eq("owner_id", user.id).maybeSingle();
+    const [{ data: pharm }, { data: prof }] = await Promise.all([
+      supabase.from("pharmacies").select("*").eq("owner_id", user.id).maybeSingle(),
+      supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+    ]);
     setPharmacy(pharm as any);
+    setProfileName(prof?.full_name || "");
     if (pharm) {
       const [{ data: prods }, { data: ords }] = await Promise.all([
         supabase.from("products").select("*").eq("pharmacy_id", pharm.id).order("created_at", { ascending: false }),
