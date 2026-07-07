@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
@@ -9,13 +10,14 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import { formatGNF } from "@/data/products";
-import { Bike, CheckCircle } from "lucide-react";
+import { formatGNF } from "@/lib/catalog";
+import { Bike, CheckCircle, Receipt } from "lucide-react";
 
 const DashboardCourier = () => {
   const { user } = useAuth();
   const [available, setAvailable] = useState<any[]>([]);
   const [mine, setMine] = useState<any[]>([]);
+  const [profileName, setProfileName] = useState<string>("");
 
   const load = async () => {
     if (!user) return;
