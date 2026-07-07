@@ -21,15 +21,17 @@ const DashboardCourier = () => {
 
   const load = async () => {
     if (!user) return;
-    const { data: av } = await supabase.from("orders")
-      .select("*, pharmacies(name, city, address)")
-      .is("courier_id", null).in("status", ["ready", "preparing"])
-      .order("created_at", { ascending: false });
-    const { data: mn } = await supabase.from("orders")
-      .select("*, pharmacies(name, city, address)")
-      .eq("courier_id", user.id).order("created_at", { ascending: false });
+    const [{ data: av }, { data: mn }, { data: prof }] = await Promise.all([
+      supabase.from("orders").select("*, pharmacies(name, city, address)")
+        .is("courier_id", null).in("status", ["ready", "preparing"])
+        .order("created_at", { ascending: false }),
+      supabase.from("orders").select("*, pharmacies(name, city, address)")
+        .eq("courier_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+    ]);
     setAvailable(av ?? []);
     setMine(mn ?? []);
+    setProfileName(prof?.full_name || "");
   };
   useEffect(() => { load(); }, [user]);
 
