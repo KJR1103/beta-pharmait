@@ -89,11 +89,16 @@ export async function fetchCatalog(opts?: { pharmacyId?: string; limit?: number 
 export async function fetchProductById(id: string): Promise<CatalogProduct | null> {
   const { data } = await supabase
     .from("products")
-    .select("*, pharmacies!inner(id, name, city, verified, active, address, phone)")
+    .select("*")
     .eq("id", id)
     .maybeSingle();
   if (!data) return null;
-  return toCatalog(data);
+  const { data: ph } = await supabase
+    .from("pharmacies_public")
+    .select("id, name, city, address, verified, active")
+    .eq("id", (data as any).pharmacy_id)
+    .maybeSingle();
+  return toCatalog({ ...data, pharmacy: ph });
 }
 
 export type PublicPharmacy = {
