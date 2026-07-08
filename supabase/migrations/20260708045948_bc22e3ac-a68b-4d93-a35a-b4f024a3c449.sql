@@ -1,0 +1,1 @@
+ALTER VIEW public.pharmacies_public SET (security_invoker = false);
