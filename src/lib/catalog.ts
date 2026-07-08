@@ -62,28 +62,43 @@ const toCatalog = (row: any): CatalogProduct => ({
 });
 
 export async function fetchCatalog(opts?: { pharmacyId?: string; limit?: number }): Promise<CatalogProduct[]> {
+  // Get verified & active pharmacies from the public view (avoids RLS on base table)
+  const { data: phs, error: phErr } = await supabase
+    .from("pharmacies_public")
+    .select("id, name, city, verified, active")
+    .eq("verified", true)
+    .eq("active", true);
+  if (phErr) { console.error(phErr); return []; }
+  const phMap = new Map((phs ?? []).map((p: any) => [p.id, p]));
+  const ids = Array.from(phMap.keys());
+  if (ids.length === 0) return [];
+
   let q = supabase
     .from("products")
-    .select("*, pharmacies!inner(id, name, city, verified, active)")
+    .select("*")
     .eq("active", true)
-    .eq("pharmacies.verified", true)
-    .eq("pharmacies.active", true)
+    .in("pharmacy_id", ids)
     .order("created_at", { ascending: false });
   if (opts?.pharmacyId) q = q.eq("pharmacy_id", opts.pharmacyId);
   if (opts?.limit) q = q.limit(opts.limit);
   const { data, error } = await q;
   if (error) { console.error(error); return []; }
-  return (data ?? []).map(toCatalog);
+  return (data ?? []).map((row: any) => toCatalog({ ...row, pharmacy: phMap.get(row.pharmacy_id) }));
 }
 
 export async function fetchProductById(id: string): Promise<CatalogProduct | null> {
   const { data } = await supabase
     .from("products")
-    .select("*, pharmacies!inner(id, name, city, verified, active, address, phone)")
+    .select("*")
     .eq("id", id)
     .maybeSingle();
   if (!data) return null;
-  return toCatalog(data);
+  const { data: ph } = await supabase
+    .from("pharmacies_public")
+    .select("id, name, city, address, verified, active")
+    .eq("id", (data as any).pharmacy_id)
+    .maybeSingle();
+  return toCatalog({ ...data, pharmacy: ph });
 }
 
 export type PublicPharmacy = {
