@@ -417,6 +417,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_pharmacy_public: { Args: { _pharmacy_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "customer" | "pharmacy" | "courier" | "admin"
