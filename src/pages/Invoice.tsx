@@ -15,6 +15,8 @@ import { toast } from "sonner";
 const Invoice = () => {
   const { orderId } = useParams();
   const [data, setData] = useState<any>(null);
+  const printRef = useRef<HTMLDivElement>(null);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     if (!orderId) return;
@@ -26,6 +28,34 @@ const Invoice = () => {
     })();
   }, [orderId]);
 
+  const downloadPdf = async () => {
+    if (!printRef.current) return;
+    setDownloading(true);
+    try {
+      const canvas = await html2canvas(printRef.current, { scale: 2, backgroundColor: "#ffffff" });
+      const img = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ unit: "mm", format: "a4" });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const imgH = (canvas.height * pageW) / canvas.width;
+      let heightLeft = imgH;
+      let position = 0;
+      pdf.addImage(img, "PNG", 0, position, pageW, imgH);
+      heightLeft -= pageH;
+      while (heightLeft > 0) {
+        position = heightLeft - imgH;
+        pdf.addPage();
+        pdf.addImage(img, "PNG", 0, position, pageW, imgH);
+        heightLeft -= pageH;
+      }
+      pdf.save(`Facture-${data.invoices?.[0]?.invoice_number || data.order_number}.pdf`);
+    } catch (e: any) {
+      toast.error("Erreur PDF: " + e.message);
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   if (!data) return (
     <div className="min-h-screen flex flex-col"><Navbar /><main className="flex-1 container py-10">Chargement...</main><Footer /></div>
   );
@@ -36,12 +66,15 @@ const Invoice = () => {
     <div className="min-h-screen flex flex-col bg-secondary/20 print:bg-white">
       <div className="print:hidden"><Navbar /></div>
       <main className="flex-1 container py-6 md:py-10 max-w-3xl">
-        <div className="flex items-center justify-between mb-4 print:hidden">
+        <div className="flex items-center justify-between mb-4 print:hidden flex-wrap gap-2">
           <Button variant="ghost" asChild><Link to="/dashboard/customer"><ArrowLeft className="w-4 h-4" /> Retour</Link></Button>
-          <Button variant="hero" onClick={() => window.print()}><Printer className="w-4 h-4" /> Imprimer / PDF</Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => window.print()}><Printer className="w-4 h-4" /> Imprimer</Button>
+            <Button variant="hero" onClick={downloadPdf} disabled={downloading}><Download className="w-4 h-4" /> {downloading ? "..." : "Télécharger PDF"}</Button>
+          </div>
         </div>
 
-        <Card className="print:shadow-none print:border-0">
+        <Card className="print:shadow-none print:border-0" ref={printRef as any}>
           <CardContent className="p-8 space-y-6">
             <div className="flex items-start justify-between border-b pb-6">
               <div>
