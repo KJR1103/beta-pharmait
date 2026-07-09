@@ -163,13 +163,6 @@ export type Database = {
             referencedRelation: "pharmacies"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "orders_pharmacy_id_fkey"
-            columns: ["pharmacy_id"]
-            isOneToOne: false
-            referencedRelation: "pharmacies_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       pharmacies: {
@@ -231,6 +224,51 @@ export type Database = {
           owner_id?: string
           phone?: string
           updated_at?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
+      pharmacies_public: {
+        Row: {
+          active: boolean
+          address: string
+          city: string
+          created_at: string
+          description: string | null
+          id: string
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          name: string
+          opening_hours: string | null
+          verified: boolean
+        }
+        Insert: {
+          active?: boolean
+          address: string
+          city: string
+          created_at?: string
+          description?: string | null
+          id: string
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name: string
+          opening_hours?: string | null
+          verified?: boolean
+        }
+        Update: {
+          active?: boolean
+          address?: string
+          city?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          name?: string
+          opening_hours?: string | null
           verified?: boolean
         }
         Relationships: []
@@ -301,13 +339,6 @@ export type Database = {
             referencedRelation: "pharmacies"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "products_pharmacy_id_fkey"
-            columns: ["pharmacy_id"]
-            isOneToOne: false
-            referencedRelation: "pharmacies_public"
-            referencedColumns: ["id"]
-          },
         ]
       }
       profiles: {
@@ -363,51 +394,7 @@ export type Database = {
       }
     }
     Views: {
-      pharmacies_public: {
-        Row: {
-          active: boolean | null
-          address: string | null
-          city: string | null
-          created_at: string | null
-          description: string | null
-          id: string | null
-          latitude: number | null
-          logo_url: string | null
-          longitude: number | null
-          name: string | null
-          opening_hours: string | null
-          verified: boolean | null
-        }
-        Insert: {
-          active?: boolean | null
-          address?: string | null
-          city?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          latitude?: number | null
-          logo_url?: string | null
-          longitude?: number | null
-          name?: string | null
-          opening_hours?: string | null
-          verified?: boolean | null
-        }
-        Update: {
-          active?: boolean | null
-          address?: string | null
-          city?: string | null
-          created_at?: string | null
-          description?: string | null
-          id?: string | null
-          latitude?: number | null
-          logo_url?: string | null
-          longitude?: number | null
-          name?: string | null
-          opening_hours?: string | null
-          verified?: boolean | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       has_role: {
