@@ -23,7 +23,7 @@ const DashboardCourier = () => {
     if (!user) return;
     const [{ data: av }, { data: mn }, { data: prof }] = await Promise.all([
       supabase.from("orders").select("*, pharmacies(name, city, address)")
-        .is("courier_id", null).in("status", ["ready", "preparing"])
+        .is("courier_id", null).in("status", ["pending", "confirmed", "preparing", "ready"])
         .order("created_at", { ascending: false }),
       supabase.from("orders").select("*, pharmacies(name, city, address)")
         .eq("courier_id", user.id).order("created_at", { ascending: false }),
