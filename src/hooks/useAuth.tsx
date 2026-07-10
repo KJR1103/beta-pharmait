@@ -9,6 +9,9 @@ type AuthContextValue = {
   session: Session | null;
   roles: AppRole[];
   loading: boolean;
+  canOrder: boolean;
+  isPharmacy: boolean;
+  isCourier: boolean;
   refreshRoles: () => Promise<void>;
   signOut: () => Promise<void>;
 };
