@@ -54,6 +54,7 @@ const ProductDetail = () => {
   );
 
   const handleAdd = () => {
+    if (!canOrder) { toast.error("Seuls les comptes clients peuvent commander"); return; }
     addItem(product, qty);
     toast.success(`${qty} × ${product.name} ajouté au panier`);
   };
