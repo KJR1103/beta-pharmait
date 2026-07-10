@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import { Search, ShoppingCart, SlidersHorizontal, Eye, Store, Loader2 } from "lucide-react";
 import { fetchCatalog, fetchPharmacies, formatGNF, type CatalogProduct, type PublicPharmacy } from "@/lib/catalog";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 const Products = () => {
@@ -23,6 +24,7 @@ const Products = () => {
   const [pharmacies, setPharmacies] = useState<PublicPharmacy[]>([]);
   const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
+  const { canOrder } = useAuth();
 
   useEffect(() => {
     Promise.all([fetchCatalog(), fetchPharmacies()]).then(([p, ph]) => {
@@ -145,7 +147,7 @@ const Products = () => {
                           <span className="font-bold text-primary">{formatGNF(p.price)}</span>
                           <div className="flex gap-1">
                             <Link to={`/product/${p.id}`}><Button variant="outline" size="sm"><Eye className="w-4 h-4" /></Button></Link>
-                            <Button size="sm" disabled={p.prescription || p.stock <= 0} onClick={() => { addItem(p, 1); toast.success(`${p.name} ajouté`); }}>
+                            <Button size="sm" disabled={!canOrder || p.prescription || p.stock <= 0} onClick={() => { if (!canOrder) { toast.error("Seuls les comptes clients peuvent commander"); return; } addItem(p, 1); toast.success(`${p.name} ajouté`); }}>
                               <ShoppingCart className="w-4 h-4" />
                             </Button>
                           </div>

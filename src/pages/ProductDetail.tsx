@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { fetchProductById, fetchCatalog, formatGNF, type CatalogProduct } from "@/lib/catalog";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ const ProductDetail = () => {
   const [similar, setSimilar] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
+  const { canOrder } = useAuth();
   const [qty, setQty] = useState(1);
 
   useEffect(() => {
@@ -52,6 +54,7 @@ const ProductDetail = () => {
   );
 
   const handleAdd = () => {
+    if (!canOrder) { toast.error("Seuls les comptes clients peuvent commander"); return; }
     addItem(product, qty);
     toast.success(`${qty} × ${product.name} ajouté au panier`);
   };
@@ -126,8 +129,8 @@ const ProductDetail = () => {
                       <Button variant="hero" size="lg" className="w-full gap-2">Envoyer une ordonnance</Button>
                     </Link>
                   ) : (
-                    <Button variant="hero" size="lg" className="flex-1 gap-2" onClick={handleAdd} disabled={product.stock <= 0}>
-                      <ShoppingCart className="w-5 h-5" /> Ajouter au panier
+                    <Button variant="hero" size="lg" className="flex-1 gap-2" onClick={handleAdd} disabled={!canOrder || product.stock <= 0}>
+                      <ShoppingCart className="w-5 h-5" /> {canOrder ? "Ajouter au panier" : "Réservé aux clients"}
                     </Button>
                   )}
                   <Button variant="outline" size="icon" className="h-11 w-11"><Heart className="w-5 h-5" /></Button>

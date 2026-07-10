@@ -6,10 +6,12 @@ import { ShoppingCart, Heart, Eye, Store } from "lucide-react";
 import { Link } from "react-router-dom";
 import { fetchCatalog, formatGNF, type CatalogProduct } from "@/lib/catalog";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 const FeaturedProducts = () => {
   const { addItem } = useCart();
+  const { canOrder } = useAuth();
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -68,7 +70,7 @@ const FeaturedProducts = () => {
                   <span className="text-lg font-bold">{formatGNF(product.price)}</span>
                   <div className="flex gap-2">
                     <Link to={`/product/${product.id}`}><Button variant="outline" size="sm"><Eye className="w-4 h-4" /></Button></Link>
-                    <Button variant="default" size="sm" disabled={product.prescription || product.stock <= 0} onClick={() => { addItem(product, 1); toast.success(`${product.name} ajouté au panier`); }}>
+                    <Button variant="default" size="sm" disabled={!canOrder || product.prescription || product.stock <= 0} onClick={() => { if (!canOrder) { toast.error("Seuls les comptes clients peuvent commander"); return; } addItem(product, 1); toast.success(`${product.name} ajouté au panier`); }}>
                       <ShoppingCart className="w-4 h-4" />
                     </Button>
                   </div>

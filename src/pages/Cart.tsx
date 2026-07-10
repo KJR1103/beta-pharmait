@@ -7,13 +7,34 @@ import Footer from "@/components/Footer";
 import { Minus, Plus, Trash2, ShoppingBag, Truck, Shield, ArrowRight, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/hooks/useAuth";
 import { formatGNF } from "@/lib/catalog";
 
 const Cart = () => {
   const { items, updateQuantity, removeItem, subtotal, itemCount } = useCart();
+  const { canOrder, isPharmacy, isCourier } = useAuth();
   const shipping = subtotal >= 200000 ? 0 : subtotal > 0 ? 15000 : 0;
   const total = subtotal + shipping;
   const hasPrescription = items.some((i) => i.product.prescription);
+
+  if (!canOrder) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="container py-20 text-center max-w-lg mx-auto">
+          <ShoppingBag className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <h1 className="text-2xl font-bold mb-3 font-display">Commandes réservées aux clients</h1>
+          <p className="text-muted-foreground mb-6">
+            Votre compte {isPharmacy ? "pharmacie" : isCourier ? "livreur" : "professionnel"} ne peut pas passer de commande sur la plateforme. Utilisez un compte client pour acheter des produits.
+          </p>
+          <Link to={isPharmacy ? "/dashboard/pharmacy" : isCourier ? "/dashboard/courier" : "/"}>
+            <Button variant="hero">Retour à mon espace</Button>
+          </Link>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
