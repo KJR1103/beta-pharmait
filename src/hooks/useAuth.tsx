@@ -56,8 +56,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await supabase.auth.signOut();
   };
 
+  const isPharmacy = roles.includes("pharmacy");
+  const isCourier = roles.includes("courier");
+  const canOrder = !user || (!isPharmacy && !isCourier);
+
   return (
-    <AuthContext.Provider value={{ user, session, roles, loading, refreshRoles, signOut }}>
+    <AuthContext.Provider value={{ user, session, roles, loading, canOrder, isPharmacy, isCourier, refreshRoles, signOut }}>
       {children}
     </AuthContext.Provider>
   );
