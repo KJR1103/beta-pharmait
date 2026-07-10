@@ -6,10 +6,12 @@ import { ShoppingCart, Heart, Eye, Store } from "lucide-react";
 import { Link } from "react-router-dom";
 import { fetchCatalog, formatGNF, type CatalogProduct } from "@/lib/catalog";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 const FeaturedProducts = () => {
   const { addItem } = useCart();
+  const { canOrder } = useAuth();
   const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
