@@ -51,6 +51,22 @@ const Checkout = () => {
   }, {});
   const pharmacyIds = Object.keys(groups);
 
+  if (user && !canOrder) {
+    return (
+      <div className="min-h-screen bg-background"><Navbar />
+        <main className="container py-20 text-center max-w-lg mx-auto">
+          <h1 className="text-2xl font-bold mb-3 font-display">Commandes réservées aux clients</h1>
+          <p className="text-muted-foreground mb-6">
+            Les comptes {isPharmacy ? "pharmacie" : isCourier ? "livreur" : "professionnels"} ne peuvent pas valider de commande. Créez un compte client pour acheter.
+          </p>
+          <Link to={isPharmacy ? "/dashboard/pharmacy" : isCourier ? "/dashboard/courier" : "/"}>
+            <Button variant="hero">Retour à mon espace</Button>
+          </Link>
+        </main><Footer />
+      </div>
+    );
+  }
+
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-background"><Navbar />
