@@ -20,7 +20,7 @@ import { ArrowLeft, Check, Smartphone, Banknote, MapPin, User, Phone, Loader2 } 
 const Checkout = () => {
   const { items, subtotal, clearCart } = useCart();
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, canOrder, isPharmacy, isCourier } = useAuth();
   const [payment, setPayment] = useState("orange");
   const [city, setCity] = useState("Conakry");
   const [neighborhood, setNeighborhood] = useState("");
