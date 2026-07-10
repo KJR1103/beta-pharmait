@@ -20,6 +20,7 @@ const ProductDetail = () => {
   const [similar, setSimilar] = useState<CatalogProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
+  const { canOrder } = useAuth();
   const [qty, setQty] = useState(1);
 
   useEffect(() => {
