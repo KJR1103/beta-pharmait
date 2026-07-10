@@ -24,6 +24,7 @@ const Products = () => {
   const [pharmacies, setPharmacies] = useState<PublicPharmacy[]>([]);
   const [loading, setLoading] = useState(true);
   const { addItem } = useCart();
+  const { canOrder } = useAuth();
 
   useEffect(() => {
     Promise.all([fetchCatalog(), fetchPharmacies()]).then(([p, ph]) => {
