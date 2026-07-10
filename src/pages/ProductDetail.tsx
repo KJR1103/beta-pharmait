@@ -129,8 +129,8 @@ const ProductDetail = () => {
                       <Button variant="hero" size="lg" className="w-full gap-2">Envoyer une ordonnance</Button>
                     </Link>
                   ) : (
-                    <Button variant="hero" size="lg" className="flex-1 gap-2" onClick={handleAdd} disabled={product.stock <= 0}>
-                      <ShoppingCart className="w-5 h-5" /> Ajouter au panier
+                    <Button variant="hero" size="lg" className="flex-1 gap-2" onClick={handleAdd} disabled={!canOrder || product.stock <= 0}>
+                      <ShoppingCart className="w-5 h-5" /> {canOrder ? "Ajouter au panier" : "Réservé aux clients"}
                     </Button>
                   )}
                   <Button variant="outline" size="icon" className="h-11 w-11"><Heart className="w-5 h-5" /></Button>
