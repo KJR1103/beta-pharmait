@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import { Search, ShoppingCart, SlidersHorizontal, Eye, Store, Loader2 } from "lucide-react";
 import { fetchCatalog, fetchPharmacies, formatGNF, type CatalogProduct, type PublicPharmacy } from "@/lib/catalog";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 const Products = () => {
